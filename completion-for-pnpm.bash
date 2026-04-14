@@ -29,4 +29,3 @@ if type complete &>/dev/null; then
   complete -o default -F _pnpm_completion pnpm
 fi
 ###-end-pnpm-completion-###
-

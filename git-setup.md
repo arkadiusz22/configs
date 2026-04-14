@@ -4,7 +4,7 @@ Git is installed and managed exclusively within **WSL**. The Windows installatio
 
 ## .gitconfig
 
-Create `~/.gitconfig` as below, and leverage the include to shared file `~/projects/configs/.gitconfig_shared`.
+Create `~/.gitconfig` as below, and leverage the include to shared file `/home/arekz/projects/configs/.gitconfig_shared`.
 
 ```
 [user]
@@ -12,7 +12,7 @@ Create `~/.gitconfig` as below, and leverage the include to shared file `~/proje
 	email = <user_email>
 	signingkey = <gpg_key_id>
 [include]
-    path = ~/projects/configs/git/.gitconfig_shared
+    path = /home/arekz/projects/configs/.gitconfig_shared
 ```
 
 ## Git for Windows — Installer Options
