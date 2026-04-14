@@ -56,6 +56,9 @@ Create `/etc/wsl.conf`
 ```
 [boot]
 systemd=true
+
+[user]
+default=arekz
 ```
 
 ## .bashrc

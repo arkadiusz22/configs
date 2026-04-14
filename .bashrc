@@ -94,15 +94,15 @@ if ! shopt -oq posix; then
 fi
 
 # ─── Node Version Manager (nvm) ───────────────────────────────────────────────
-# Load nvm and its bash completion for switching Node.js versions per project
+# Define NVM directory and load nvm initialization scripts
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Updates the 'node-active' symlink to point to the current NVM node version
 update_node_symlink() {
-    local node_path
-    node_path=$(which node)
+    # Use provided path or fallback to nvm's current path, then to 'which node'
+    local node_path="${1:-$(nvm which current 2>/dev/null || which node 2>/dev/null)}"
     local symlink_path="$HOME/node-active"
 
     if [ -n "$node_path" ]; then
@@ -113,14 +113,39 @@ update_node_symlink() {
     fi
 }
 
-# Override nvm command to trigger symlink update after version changes
+# Wrapper function for nvm to trigger symlink updates on version changes
 nvm() {
-    command nvm "$@"
+    # 1. Temporarily remove the wrapper to call the original nvm function
+    unset -f nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # 2. Execute the original nvm command with all arguments
+    nvm "$@"
+    local ret=$?
+
+    # 3. Handle symlink update for specific commands
     case "$1" in
         use|install|alias|unalias)
-            update_node_symlink
+            update_node_symlink "$(nvm which current 2>/dev/null)"
             ;;
     esac
+
+    # 4. Re-define the wrapper so it persists for the next call
+    # This is necessary because 'unset -f' removed it from the current session
+    eval 'nvm() {
+        unset -f nvm
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm "$@"
+        local r=$?
+        case "$1" in
+            use|install|alias|unalias)
+                update_node_symlink "$(nvm which current 2>/dev/null)"
+                ;;
+        esac
+        return $r
+    }'
+
+    return $ret
 }
 
 # Initial update on shell start to ensure symlink exists and is correct
