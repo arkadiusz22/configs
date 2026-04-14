@@ -63,6 +63,7 @@ code --install-extension seyyedkhandon.firacode
   "editor.renderWhitespace": "selection",
   "editor.semanticHighlighting.enabled": true,
   "editor.stickyScroll.enabled": true,
+  "editor.fontSize": 14,
 
   // ─────────────────────────────────────────
   // EDITOR — Formatting & Indentation
@@ -107,6 +108,7 @@ code --install-extension seyyedkhandon.firacode
   "terminal.integrated.defaultProfile.windows": "Ubuntu",
   "terminal.integrated.scrollback": 10000,
   "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.fontFamily": "Fira Code",
 
   // ─────────────────────────────────────────
   // DIFF EDITOR
