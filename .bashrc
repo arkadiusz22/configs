@@ -159,6 +159,8 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+source '~/completion-for-pnpm.bash'
+
 # ─── Aliases ──────────────────────────────────────────────────────────────────
 # Load custom aliases from a separate file to keep this config clean
 if [ -f ~/projects/configs/.bash_aliases ]; then
