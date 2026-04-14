@@ -31,3 +31,20 @@ For future reference - set of options for git on windows installation.
 | **Default `git pull` behavior** | Fast-forward or merge                 | Standard behavior (overridden by `rebase` in shared config). |
 | **Credential helper**           | **Git Credential Manager**            | Reliable auth handler for GitHub/Azure DevOps.               |
 | **Extra options**               | Enable file system caching            | Critical for performance when accessing NTFS drives.         |
+
+## GPG Key
+
+### `.gnupg/gpg-agent.conf`
+
+```
+allow-loopback-pinentry
+default-cache-ttl 34560000
+max-cache-ttl 34560000
+```
+
+### `.gnupg/gpg.conf`
+
+```
+use-agent
+pinentry-mode loopback
+```

@@ -12,7 +12,7 @@ esac
 export EDITOR='code --wait'
 export VISUAL='code --wait'
 export PROJECTS="$HOME/projects"
-export GPG_TTY=$(tty)
+export GPG_TTY=$(tty 2>/dev/null)
 export BROWSER="wslview" # WSL: open URLs in Windows default browser
 export PATH="$HOME/.local/bin:$PATH" # Local user binaries
 
@@ -98,6 +98,33 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Updates the 'node-active' symlink to point to the current NVM node version
+update_node_symlink() {
+    local node_path
+    node_path=$(which node)
+    local symlink_path="$HOME/node-active"
+
+    if [ -n "$node_path" ]; then
+        # Only update if the symlink is different to avoid unnecessary disk writes
+        if [ "$(readlink "$symlink_path")" != "$node_path" ]; then
+            ln -sf "$node_path" "$symlink_path"
+        fi
+    fi
+}
+
+# Override nvm command to trigger symlink update after version changes
+nvm() {
+    command nvm "$@"
+    case "$1" in
+        use|install|alias|unalias)
+            update_node_symlink
+            ;;
+    esac
+}
+
+# Initial update on shell start to ensure symlink exists and is correct
+update_node_symlink
 
 # ─── pnpm ─────────────────────────────────────────────────────────────────────
 # Add pnpm global bin directory to PATH

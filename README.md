@@ -64,7 +64,7 @@ Leverage symlink from `~/projects/configs/.bashrc` to `~/.bashrc`.
 Keep `.bash_aliases` in `~/projects/configs`.
 Keep `.bash_secrets` in `~/`.
 
-```
+```bash
 ln -sf ~/projects/configs/.bashrc ~/.bashrc
 ```
 
