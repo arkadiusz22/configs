@@ -1,4 +1,5 @@
 # ~/.bashrc
+# Symlinked: ~/.bashrc -> ~/projects/configs/.bashrc
 
 # If not running interactively, don't do anything
 case $- in
@@ -12,6 +13,8 @@ export EDITOR='code --wait'
 export VISUAL='code --wait'
 export PROJECTS="$HOME/projects"
 export GPG_TTY=$(tty)
+export BROWSER="wslview" # WSL: open URLs in Windows default browser
+export PATH="$HOME/.local/bin:$PATH" # Local user binaries
 
 # Ensure projects directory exists
 [ ! -d "$PROJECTS" ] && mkdir -p "$PROJECTS"
@@ -21,6 +24,7 @@ export GPG_TTY=$(tty)
 HISTCONTROL=ignoreboth:erasedups
 HISTSIZE=10000
 HISTFILESIZE=20000
+HISTIGNORE="ls:ll:cd:pwd:clear:c" # Skip saving trivial commands to history
 # Append to the history file, don't overwrite it
 shopt -s histappend
 # Immediate history sync across multiple terminal sessions
@@ -94,6 +98,14 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# ─── pnpm ─────────────────────────────────────────────────────────────────────
+# Add pnpm global bin directory to PATH
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 
 # ─── Aliases ──────────────────────────────────────────────────────────────────
 # Load custom aliases from a separate file to keep this config clean
