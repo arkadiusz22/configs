@@ -34,7 +34,6 @@ powercfg /change disk-timeout-ac 0
 - **Essential Extensions:**
   - **uBlock Origin:** Content filtering and telemetry blocking.
   - **React Developer Tools:** Component profiling and state debugging.
-- **Configuration:** Enable **Developer Mode** in extension settings to allow sideloading/unpacked extensions.
 
 ### Set Firefox as Default
 
@@ -75,15 +74,14 @@ if ($setup) {
 ### 4.1. Explorer & UI Visibility
 
 ```powershell
-$Exp = "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+$Exp = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
 
-# Show file extensions, hidden files, and protected OS files
+# Show file extensions, hidden files, and protected OS files (ShowSuperHidden)
 Set-ItemProperty -Path $Exp -Name "HideFileExt" -Value 0
 Set-ItemProperty -Path $Exp -Name "Hidden" -Value 1
 Set-ItemProperty -Path $Exp -Name "ShowSuperHidden" -Value 0
 
 # Navigation and Behavior
-Set-ItemProperty -Path $Exp -Name "LaunchTo" -Value 1                      # Open to 'This PC'
 Set-ItemProperty -Path $Exp -Name "NavPane_ShowOneDriveByDefault" -Value 0  # Hide OneDrive sidebar
 Set-ItemProperty -Path $Exp -Name "ShowSyncProviderNotifications" -Value 0 # Disable Explorer ads
 ```
@@ -91,19 +89,22 @@ Set-ItemProperty -Path $Exp -Name "ShowSyncProviderNotifications" -Value 0 # Dis
 ### 4.2. Telemetry & Privacy
 
 ```powershell
-# Core Telemetry
-$PolicyPath = "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
-if (!(Test-Path $PolicyPath)) { New-Item -Path $PolicyPath -Force }
-Set-ItemProperty -Path $PolicyPath -Name "AllowTelemetry" -Value 0
+# Core Telemetry (System Level)
+$DataColl = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
+if (!(Test-Path $DataColl)) { New-Item -Path $DataColl -Force }
+Set-ItemProperty -Path $DataColl -Name "AllowTelemetry" -Value 0
 
 # Activity History & Advertising
-$SystemPolicy = "HKLM\SOFTWARE\Policies\Microsoft\Windows\System"
-Set-ItemProperty -Path $SystemPolicy -Name "EnableActivityFeed" -Value 0
-Set-ItemProperty -Path $SystemPolicy -Name "PublishUserActivities" -Value 0
-Set-ItemProperty -Path "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -Name "Enabled" -Value 0
+$WinSys = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"
+if (!(Test-Path $WinSys)) { New-Item -Path $WinSys -Force }
+Set-ItemProperty -Path $WinSys -Name "EnableActivityFeed" -Value 0
+Set-ItemProperty -Path $WinSys -Name "PublishUserActivities" -Value 0
+
+$Adv = "HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
+Set-ItemProperty -Path $Adv -Name "Enabled" -Value 0
 
 # Content Delivery Manager (Start Menu Ads, Suggestions, Lockscreen)
-$CDM = "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+$CDM = "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
 $CDMTweaks = @{
     "SystemPaneSuggestionsEnabled" = 0
     "SoftLandingEnabled"           = 0
@@ -121,19 +122,21 @@ foreach ($Name in $CDMTweaks.Keys) {
 
 ```powershell
 # Set visual effects to 'Best Performance' (Disables animations)
-Set-ItemProperty -Path "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2
+$Visual = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"
+Set-ItemProperty -Path $Visual -Name "VisualFXSetting" -Value 2
 
 # Windows Update Active Hours (6:00 - 22:00)
-$WU = "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"
+$WU = "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"
+if (!(Test-Path $WU)) { New-Item -Path $WU -Force }
 Set-ItemProperty -Path $WU -Name "ActiveHoursStart" -Value 6
 Set-ItemProperty -Path $WU -Name "ActiveHoursEnd" -Value 22
 
-# Stop and disable unnecessary management services
+# Stop and disable unnecessary management services (Intel AMT)
 Stop-Service AIMTManageabilityService -ErrorAction SilentlyContinue
-Set-Service AIMTManageabilityService -StartupType Disabled
+Set-Service AIMTManageabilityService -StartupType Disabled -ErrorAction SilentlyContinue
 
 # Remove OneDrive from Startup
-Remove-ItemProperty -Path "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" -Name "OneDriveSetup" -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "OneDriveSetup" -ErrorAction SilentlyContinue
 ```
 
 > [!NOTE]
