@@ -1,0 +1,12 @@
+[commit]
+    gpgSign = true
+[tag]
+    gpgSign = true
+[gpg]
+    program = gpg
+[core]
+    editor = code --wait
+    fileMode = false
+    autocrlf = input
+[pull]
+    rebase = true
