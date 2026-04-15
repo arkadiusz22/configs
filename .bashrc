@@ -69,10 +69,27 @@ xterm*|rxvt*)
 esac
 
 # ─── GPG and SSH Agents ───────────────────────────────────────────────────────
-# Start GPG agent for signed commits
+# Ensure GPG agent is running
 if ! pgrep -x -u "$USER" gpg-agent >/dev/null; then
     gpg-connect-agent /bye >/dev/null 2>&1
 fi
+
+# ─── GPG Auto-Unlock ──────────────────────────────────────────────────────────
+# Function to pre-authorize GPG key in the current session.
+gpg-unlock() {
+    # Check if the passphrase is already in the agent's cache
+    if ! echo "test" | gpg --batch --no-tty --clearsign > /dev/null 2>&1; then
+        echo "🔐 GPG: Key is locked. Enter passphrase to enable VS Code signing:"
+        # Prompt for passphrase in the terminal (TTY)
+        echo "test" | gpg --clearsign > /dev/null
+    else
+        # Silent confirmation for CLI users
+        echo "✅ GPG: Key is cached and ready."
+    fi
+}
+
+# Run the unlock function on shell startup
+gpg-unlock
 
 # Start SSH agent and add your private key for GitHub authentication
 if [ -z "$SSH_AUTH_SOCK" ]; then
